@@ -22,7 +22,7 @@ app.use(cors({ origin: "http://localhost:3000" }));
 app.use(async (req, res, next) => {
   const isAuthorized = await verifyAuthNostr(req, process.env.NPUB);
   if (!isAuthorized) {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(401).json({ error: "Unauthorized" });
   }
   next();
 });
@@ -43,7 +43,6 @@ app.get("/rules/:id", async (req, res) => {
 });
 
 app.post("/rules", async (req, res) => {
-  console.log("BODY: ", req.body);
   const newRule = req.body;
   const rule = await createRule(newRule);
   res.json(rule);
@@ -51,7 +50,6 @@ app.post("/rules", async (req, res) => {
 
 app.put("/rules/:id", async (req, res) => {
   const ruleId = parseInt(req.params.id);
-  console.log("ruleId: ", ruleId);
   const updatedRule = req.body;
   const rule = await updateRule(ruleId, updatedRule);
   if (rule) {

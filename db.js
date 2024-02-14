@@ -7,6 +7,7 @@ function createTables() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
       type TEXT,
+      relays TEXT,
       filter TEXT
     )
   `;
@@ -52,23 +53,33 @@ function getRuleById(id) {
   });
 }
 function createRule(rule) {
-  const { name, type, filter } = rule;
-  const sql = "INSERT INTO rules (name, type, filter) VALUES (?, ?, ?)";
+  const { name, type, relays, filter } = rule;
+  const sql =
+    "INSERT INTO rules (name, type, relays, filter) VALUES (?, ?, ?, ?)";
   return new Promise((resolve, reject) => {
-    db.run(sql, [name, type, JSON.stringify(filter)], function (err) {
-      if (err) reject(err);
-      resolve({ id: this.lastID, name, type, filter });
-    });
+    db.run(
+      sql,
+      [name, type, JSON.stringify(relays), JSON.stringify(filter)],
+      function (err) {
+        if (err) reject(err);
+        resolve({ id: this.lastID, name, type, relays, filter });
+      },
+    );
   });
 }
 function updateRule(id, updatedRule) {
-  const { name, type, filter } = updatedRule;
-  const sql = "UPDATE rules SET name = ?, type = ?, filter = ? WHERE id = ?";
+  const { name, type, relays, filter } = updatedRule;
+  const sql =
+    "UPDATE rules SET name = ?, type = ?, relays = ?, filter = ? WHERE id = ?";
   return new Promise((resolve, reject) => {
-    db.run(sql, [name, type, JSON.stringify(filter), id], function (err) {
-      if (err) reject(err);
-      resolve({ id, name, type, filter });
-    });
+    db.run(
+      sql,
+      [name, type, JSON.stringify(relays), JSON.stringify(filter), id],
+      function (err) {
+        if (err) reject(err);
+        resolve({ id, name, type, relays, filter });
+      },
+    );
   });
 }
 function deleteRule(id) {
