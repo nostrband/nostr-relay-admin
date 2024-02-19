@@ -8,6 +8,9 @@ import {
   deleteRule,
   getRelays,
   updateRelays,
+  createTask,
+  updateTaskStatus,
+  getTasksByEventIds,
 } from "./db.js";
 import { verifyAuthNostr } from "./auth.js";
 import cors from "cors";
@@ -79,6 +82,26 @@ app.put("/relays", async (req, res) => {
   const updatedRelays = await updateRelays(relay_array);
   res.json(updatedRelays);
 });
+
+app.post("/tasks", async (req, res) => {
+  const { eventId, status } = req.body;
+  const task = await createTask(eventId, status);
+  res.json(task);
+});
+
+app.get("/tasks", async (req, res) => {
+  const { eventIds } = req.body;
+  const tasks = await getTasksByEventIds(eventIds);
+  res.json(tasks);
+});
+
+app.put("/tasks/:eventId", async (req, res) => {
+  const eventId = req.params.eventId;
+  const { status } = req.body;
+  const updatedTask = await updateTaskStatus(eventId, status);
+  res.json(updatedTask);
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

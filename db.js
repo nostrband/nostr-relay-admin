@@ -19,9 +19,23 @@ function createTables() {
     )
   `;
 
+  const tasksTableSql = `
+    CREATE TABLE IF NOT EXISTS tasks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      eventId TEXT,
+      status TEXT
+    )
+  `;
+
   return Promise.all([
     new Promise((resolve, reject) => {
       db.run(rulesTableSql, (err) => {
+        if (err) reject(err);
+        resolve();
+      });
+    }),
+    new Promise((resolve, reject) => {
+      db.run(tasksTableSql, (err) => {
         if (err) reject(err);
         resolve();
       });
@@ -100,7 +114,6 @@ function updateRelays(relayArray) {
     });
   });
 }
-
 function getRelays() {
   const sql = "SELECT relay_array FROM relays WHERE id = 1";
   return new Promise((resolve, reject) => {
@@ -110,6 +123,38 @@ function getRelays() {
     });
   });
 }
+
+function createTask(eventId, status) {
+  const sql = "INSERT INTO tasks (eventId, status) VALUES (?, ?)";
+  return new Promise((resolve, reject) => {
+    db.run(sql, [eventId, status], function (err) {
+      if (err) reject(err);
+      resolve({ id: this.lastID, eventId, status });
+    });
+  });
+}
+
+function getTasksByEventIds(eventIds) {
+  const placeholders = eventIds.map(() => "?").join(",");
+  const sql = `SELECT * FROM tasks WHERE eventId IN (${placeholders})`;
+  return new Promise((resolve, reject) => {
+    db.all(sql, eventIds, (err, rows) => {
+      if (err) reject(err);
+      resolve(rows);
+    });
+  });
+}
+
+async function updateTaskStatus(eventId, status) {
+  const sql = "UPDATE tasks SET status = ? WHERE eventId = ?";
+  return new Promise((resolve, reject) => {
+    db.run(sql, [status, eventId], function (err) {
+      if (err) reject(err);
+      resolve({ eventId, status });
+    });
+  });
+}
+
 (async () => {
   await createTables();
 })();
@@ -123,4 +168,7 @@ export {
   deleteRule,
   getRelays,
   updateRelays,
+  createTask,
+  updateTaskStatus,
+  getTasksByEventIds,
 };
