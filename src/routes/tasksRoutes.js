@@ -10,7 +10,7 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const { eventIds } = req.body;
+  const eventIds = Object.values(req.query);
   const tasks = await getTasksByEventIds(eventIds);
   res.json(tasks);
 });
