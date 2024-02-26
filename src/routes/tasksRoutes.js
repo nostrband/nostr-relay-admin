@@ -1,5 +1,10 @@
 import express from "express";
-import { createTask, getTasksByEventIds, updateTaskStatus } from "../db.js";
+import {
+  createTask,
+  getTasksByEventIds,
+  updateTaskStatus,
+  deleteTaskByEventId,
+} from "../db.js";
 
 const router = express.Router();
 
@@ -20,6 +25,16 @@ router.put("/:eventId", async (req, res) => {
   const { status } = req.body;
   const updatedTask = await updateTaskStatus(eventId, status);
   res.json(updatedTask);
+});
+
+router.delete("/:eventId", async (req, res) => {
+  const eventId = req.params.eventId;
+  const success = await deleteTaskByEventId(eventId);
+  if (success) {
+    res.json({ success: true, message: "Task deleted successfully" });
+  } else {
+    res.status(404).json({ success: false, message: "Task not found" });
+  }
 });
 
 export default router;

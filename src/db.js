@@ -155,6 +155,16 @@ async function updateTaskStatus(eventId, status) {
   });
 }
 
+function deleteTaskByEventId(eventId) {
+  const sql = "DELETE FROM tasks WHERE eventId = ?";
+  return new Promise((resolve, reject) => {
+    db.run(sql, [eventId], function (err) {
+      if (err) reject(err);
+      resolve(this.changes > 0);
+    });
+  });
+}
+
 (async () => {
   await createTables();
 })();
@@ -171,4 +181,5 @@ export {
   createTask,
   updateTaskStatus,
   getTasksByEventIds,
+  deleteTaskByEventId,
 };
